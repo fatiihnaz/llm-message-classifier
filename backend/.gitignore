@@ -1,0 +1,21 @@
+# .NET build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log
+
+# Other
+*.cache
+*.env
+*.appsettings.Development.json
+Migrations/
