@@ -4,6 +4,7 @@ import Sidebar from '../../components/Sidebar';
 import { fetchSupportRequests } from '../../../hooks/useHttp';
 
 export default function SupportSidebarContainer({
+  user,
   categories,
   selectedCategory,
   activeChatId,
@@ -19,6 +20,7 @@ export default function SupportSidebarContainer({
 
   return (
     <Sidebar
+      user={user}
       conversations={isLoading || isError ? [] : data}
       activeChatId={activeChatId}
       categories={categories}

@@ -1,20 +1,38 @@
 "use client";
 
-import Header from "./components/Header";
+import CustomerSidebarContainer from "./components/CustomerSidebarContainer";
 import CustomerChat from "./components/CustomerChat";
+import { useState, useEffect } from "react";
 
 export default function CustomerPage() {
+
+  const [user, setUser] = useState({
+      username: "",
+      userId: "",
+    });
+  
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const u = localStorage.getItem("username") || "Kullanıcı";
+        setUser({
+          username: u,
+          userId: u, // şimdilik username = userId
+        });
+      }
+    }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <Header />
-      
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="h-full max-h-[calc(100vh-8rem)]">
-          <CustomerChat />
+    <div className="min-h-screen bg-gray-50 flex">
+          <CustomerSidebarContainer
+            user={user}
+            activeChatId={null}
+            onSelectChat={undefined}
+          />
+    
+          {/* Content */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <CustomerChat />
+          </div>
         </div>
-      </main>
-    </div>
   );
 }

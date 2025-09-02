@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, MessageSquarePlus } from "lucide-react";
 import SidebarCategorySelector from "../support/components/SidebarCategorySelector";
 import SidebarSupportRequests from "../support/components/SidebarSupportRequests";
 
 export default function Sidebar({
+  user,
   conversations = [],
   categories = [],
   activeChatId = null,
@@ -15,16 +15,8 @@ export default function Sidebar({
   onSelectDashboard,
   onSelectCategory,
 }) {
-  const [username, setUsername] = useState("");
 
   const isSupport = usePathname().includes("/support");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const u = localStorage.getItem("username") || "Kullanıcı";
-      setUsername(u);
-    }
-  }, []);
 
   return (
     <aside className="w-86 shrink-0 border-r border-gray-200 bg-white flex flex-col h-screen sticky top-0">
@@ -32,12 +24,12 @@ export default function Sidebar({
       <div className="px-4 py-4 border-b border-gray-200 flex items-center gap-3">
         <div className="relative">
           <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
-            {username?.[0]?.toUpperCase() || "D"}
+            {user.username?.[0]?.toUpperCase() || "D"}
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
         </div>
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-gray-900 truncate">{username}</div>
+          <div className="text-sm font-semibold text-gray-900 truncate">{user.username}</div>
           <div className="text-xs text-gray-500">{isSupport ? "Destek Ekibi" : "Müşteri"}</div>
         </div>
       </div>

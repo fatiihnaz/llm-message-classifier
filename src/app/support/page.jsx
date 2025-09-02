@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Headphones, Users, MessageSquare, BarChart3, Smile, CreditCard, Truck, MapPin } from "lucide-react";
 
 import SupportChat from "./components/SupportChat";
@@ -11,6 +11,21 @@ export default function SupportPage() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [view, setView] = useState("dashboard"); // dashboard | category | conversation
+
+  const [user, setUser] = useState({
+    username: "",
+    userId: "",
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const u = localStorage.getItem("username") || "Kullanıcı";
+      setUser({
+        username: u,
+        userId: u, // şimdilik username = userId
+      });
+    }
+  }, []);
 
   // Dashboard landing (AI Telemetry)
   const exerciseData = [
@@ -78,6 +93,7 @@ export default function SupportPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <SupportSidebarContainer
+        user={user}
         activeChatId={activeChatId}
         categories={categories}
         selectedCategory={selectedCategory}
