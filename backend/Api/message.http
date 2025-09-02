@@ -4,3 +4,7 @@ Content-Type: application/json
 {
   "Text": "kargom nerede kaldı?"
 }
+
+### Get Message
+GET http://localhost:5000/api/messages?RoutingKey=support.cargo.management
+Accept: application/json

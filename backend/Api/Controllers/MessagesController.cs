@@ -58,12 +58,21 @@ public class MessagesController : ControllerBase
         return Accepted(new { message.MessageId, routingKey });
     }
 
-    [HttpGet("messages")]
+    [HttpGet("support")]
     public async Task<IActionResult> GetMessages([FromQuery] string RoutingKey, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(RoutingKey)) return BadRequest("RoutingKey required.");
 
         var messages = await _operations.GetClassifiedMessagesAsync(RoutingKey, ct);
+        return Ok(messages);
+    }
+
+    [HttpGet("user")]
+    public async Task<IActionResult> GetUserMessages([FromQuery] string UserId, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(UserId)) return BadRequest("UserId required.");
+
+        var messages = await _operations.GetUserMessagesAsync(UserId, ct);
         return Ok(messages);
     }
 }

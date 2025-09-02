@@ -26,4 +26,9 @@ public class MessageOperations : IMessageOperations
     {
         return await _database.SupportMessages.AsNoTracking().Where(m => m.Status == "Classified" && m.RoutingKey == RoutingKey).ToListAsync(ct);
     }
+
+    public async Task<List<SupportMessage>> GetUserMessagesAsync(string UserId, CancellationToken ct)
+    {
+        return await _database.SupportMessages.AsNoTracking().Where(m => m.UserId == UserId).ToListAsync(ct);
+    }
 }
