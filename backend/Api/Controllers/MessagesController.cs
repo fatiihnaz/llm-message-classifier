@@ -61,18 +61,24 @@ public class MessagesController : ControllerBase
     [HttpGet("support")]
     public async Task<IActionResult> GetMessages([FromQuery] string RoutingKey, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(RoutingKey)) return BadRequest("RoutingKey required.");
+        if (string.IsNullOrWhiteSpace(RoutingKey)) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "RoutingKey required" });
 
         var messages = await _operations.GetClassifiedMessagesAsync(RoutingKey, ct);
+
+        if (messages == null || !messages.Any()) return NoContent();
+
         return Ok(messages);
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetUserMessages([FromQuery] string UserId, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(UserId)) return BadRequest("UserId required.");
+        if (string.IsNullOrWhiteSpace(UserId)) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "UserId required" });
 
         var messages = await _operations.GetUserMessagesAsync(UserId, ct);
+
+        if (messages == null || !messages.Any()) return NoContent();
+
         return Ok(messages);
     }
 }
