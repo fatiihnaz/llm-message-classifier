@@ -12,7 +12,7 @@ export default function SupportSidebarContainer({
   onSelectDashboard,
   onSelectCategory,
 }) {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError , error} = useQuery({
     queryKey: ['support.requests', selectedCategory?.routingKey],
     queryFn: ({ signal }) => fetchSupportRequests({ signal, routingKey: selectedCategory?.routingKey }),
     enabled: Boolean(selectedCategory?.routingKey),
@@ -21,7 +21,9 @@ export default function SupportSidebarContainer({
   return (
     <Sidebar
       user={user}
-      conversations={isLoading || isError ? [] : data}
+      isLoading={isLoading}
+      error={isError ? error : null}
+      conversations={data || []}
       activeChatId={activeChatId}
       categories={categories}
       selectedCategory={selectedCategory}

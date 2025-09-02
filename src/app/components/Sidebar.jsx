@@ -3,10 +3,13 @@
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, MessageSquarePlus } from "lucide-react";
 import SidebarCategorySelector from "../support/components/SidebarCategorySelector";
-import SidebarSupportRequests from "../support/components/SidebarSupportRequests";
+import { SidebarCustomerConversations, SidebarSupportConversations } from "./SidebarConversations";
+import SidebarStates from "./SidebarStates";
 
 export default function Sidebar({
   user,
+  isLoading = false,
+  error = null,
   conversations = [],
   categories = [],
   activeChatId = null,
@@ -17,9 +20,10 @@ export default function Sidebar({
 }) {
 
   const isSupport = usePathname().includes("/support");
+  const ConversationComponent = isSupport ? SidebarSupportConversations : SidebarCustomerConversations;
 
   return (
-    <aside className="w-86 shrink-0 border-r border-gray-200 bg-white flex flex-col h-screen sticky top-0">
+    <aside className="w-72 shrink-0 border-r border-gray-200 bg-white flex flex-col h-screen sticky top-0">
       {/* Kullanıcı Bilgisi */}
       <div className="px-4 py-4 border-b border-gray-200 flex items-center gap-3">
         <div className="relative">
@@ -55,11 +59,11 @@ export default function Sidebar({
 
       {/* Sohbet listesi */}
       <div className="flex-1 overflow-y-auto px-2 pb-4" style={{ scrollbarWidth: "thin" }}>
-        <SidebarSupportRequests
-          conversations={conversations}
-          activeChatId={activeChatId}
-          onSelectChat={onSelectChat}
-        />
+        {(isLoading || error) ? (
+          <SidebarStates isSupport={isSupport} isLoading={isLoading} error={error} />
+        ) : (
+          <ConversationComponent conversations={conversations} activeChatId={activeChatId} onSelectChat={onSelectChat} />
+        )}
       </div>
 
       {/* Kategori seçici */}

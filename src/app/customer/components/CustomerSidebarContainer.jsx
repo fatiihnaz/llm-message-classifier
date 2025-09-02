@@ -5,15 +5,18 @@ import Sidebar from "../../components/Sidebar";
 import { fetchUserMessages } from "../../../hooks/useHttp";
 
 export default function CustomerSidebarContainer({ user, activeChatId, onSelectChat }) {
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ['customer.messages', user.userId],
         queryFn: ({ signal }) => fetchUserMessages({ signal, userId: user.userId }),
         enabled: Boolean(user.userId),
+        retry: (failureCount, error) => { if (error.message === "No messages found") return false; return failureCount < 2; }
     });
 
     return (
         <Sidebar
             user={user}
+            isLoading={isLoading}
+            error={isError ? error : null}
             conversations={isLoading || isError ? [] : data}
             activeChatId={activeChatId}
             onSelectChat={onSelectChat}
