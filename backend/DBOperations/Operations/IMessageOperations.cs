@@ -4,7 +4,8 @@ namespace DBOperations.Operations;
 
 public interface IMessageOperations
 {
-    Task AddMessageAsync(SupportMessage message, CancellationToken ct = default);
-    Task<List<SupportMessage>> GetClassifiedMessagesAsync(string RoutingKey, CancellationToken ct = default);
-    Task<List<SupportMessage>> GetUserMessagesAsync(string UserId, CancellationToken ct = default);
+    Task InitializeTicketAsync(Ticket message, CancellationToken ct = default);
+    Task<List<Ticket>> GetClassifiedMessagesAsync(string RoutingKey, CancellationToken ct = default);
+    Task<List<Ticket>> GetUserMessagesAsync(string UserId, CancellationToken ct = default);
+    Task<IReadOnlyList<ChatLine>> GetMessagesAsync(Guid TicketId, CancellationToken ct = default);
 }

@@ -16,23 +16,53 @@ public class PaymentConsumer : IConsumer<MessageDistributionContract>
     public async Task Consume(ConsumeContext<MessageDistributionContract> context)
     {
         var message = context.Message;
-        var _status = "Classified";
-        var _supportNumber = "PM-001";
 
-        var entity = new SupportMessage
+        var _messages = new List<ChatLine>
         {
-            MessageId = message.MessageId,
+            new ChatLine
+            {
+                Sender = Sender.Customer,
+                Message = message.Text,
+                Timestamp = message.CreatedAt
+            }
+        };
+
+        string? _tracking = message.CargoTrackingNumber;
+        var _status = _tracking is not null ? TicketStatus.Classified : TicketStatus.Pending;
+
+        if (_tracking is null)
+        {
+            _messages.Add(new ChatLine
+            {
+                Sender = Sender.System,
+                Message = "Kargo takip numaranızı paylaşabilir misiniz?",
+                Timestamp = DateTimeOffset.UtcNow
+            });
+        } else
+        {
+            _messages.Add(new ChatLine
+            {
+                Sender = Sender.System,
+                Message = $"Kargo takip numaranız {_tracking} ile canlı desteğe bağlıyorum.",
+                Timestamp = DateTimeOffset.UtcNow
+            });
+        }
+
+        var entity = new Ticket
+        {
+            TicketId = message.MessageId,
             UserId = message.UserId,
             RoutingKey = message.RoutingKey,
-            Text = message.Text,
+            InitialRequest = message.Text,
             Category = message.Category,
             Urgency = message.Urgency,
             SuggestedReply = message.SuggestedReply,
-            SupportNumber = _supportNumber,
+            CargoTrackingNumber = _tracking,
             Status = _status,
+            Messages = _messages,
             CreatedAt = message.CreatedAt
         };
 
-        await _operations.AddMessageAsync(entity, context.CancellationToken);
+        await _operations.InitializeTicketAsync(entity, context.CancellationToken);
     }
 }

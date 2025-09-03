@@ -16,21 +16,27 @@ public class SatisfactionConsumer : IConsumer<MessageDistributionContract>
     public async Task Consume(ConsumeContext<MessageDistributionContract> context)
     {
         var message = context.Message;
-        var _status = "Classified";
 
-        var entity = new SupportMessage
+        var _messages = new List<ChatLine>
         {
-            MessageId = message.MessageId,
+            new ChatLine { Sender = Sender.Customer, Message = message.Text, Timestamp = message.CreatedAt },
+            new ChatLine { Sender = Sender.System,   Message = "Canlı desteğe bağlıyorum.", Timestamp = DateTimeOffset.UtcNow }
+        };
+
+        var entity = new Ticket
+        {
+            TicketId = message.MessageId,
             UserId = message.UserId,
             RoutingKey = message.RoutingKey,
-            Text = message.Text,
+            InitialRequest = message.Text,
             Category = message.Category,
             Urgency = message.Urgency,
             SuggestedReply = message.SuggestedReply,
-            Status = _status,
+            Status = TicketStatus.Classified,
+            Messages = _messages,
             CreatedAt = message.CreatedAt
         };
 
-        await _operations.AddMessageAsync(entity, context.CancellationToken);
+        await _operations.InitializeTicketAsync(entity, context.CancellationToken);
     }
 }

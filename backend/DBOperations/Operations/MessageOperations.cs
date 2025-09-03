@@ -12,23 +12,30 @@ public class MessageOperations : IMessageOperations
         _database = database;
     }
 
-    public async Task AddMessageAsync(SupportMessage message, CancellationToken ct)
+    public async Task InitializeTicketAsync(Ticket message, CancellationToken ct)
     {
-        var exists = await _database.SupportMessages.AnyAsync(m => m.MessageId == message.MessageId, ct);
+        var exists = await _database.Tickets.AnyAsync(m => m.TicketId == message.TicketId, ct);
 
         if (exists) return;
 
-        await _database.SupportMessages.AddAsync(message, ct);
+        await _database.Tickets.AddAsync(message, ct);
         await _database.SaveChangesAsync(ct);
     }
 
-    public async Task<List<SupportMessage>> GetClassifiedMessagesAsync(string RoutingKey, CancellationToken ct)
+    public async Task<List<Ticket>> GetClassifiedMessagesAsync(string RoutingKey, CancellationToken ct)
     {
-        return await _database.SupportMessages.AsNoTracking().Where(m => m.Status == "Classified" && m.RoutingKey == RoutingKey).ToListAsync(ct);
+        return await _database.Tickets.AsNoTracking().Where(m => m.Status == TicketStatus.Classified && m.RoutingKey == RoutingKey).ToListAsync(ct);
     }
 
-    public async Task<List<SupportMessage>> GetUserMessagesAsync(string UserId, CancellationToken ct)
+    public async Task<List<Ticket>> GetUserMessagesAsync(string UserId, CancellationToken ct)
     {
-        return await _database.SupportMessages.AsNoTracking().Where(m => m.UserId == UserId).ToListAsync(ct);
+        return await _database.Tickets.AsNoTracking().Where(m => m.UserId == UserId).ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<ChatLine>> GetMessagesAsync(Guid TicketId, CancellationToken ct)
+    {
+        var messages = await _database.Tickets.AsNoTracking().Where(t => t.TicketId == TicketId).Select(t => t.Messages).FirstOrDefaultAsync(ct);
+        if (messages is null || messages.Count == 0) return Array.Empty<ChatLine>();
+        return messages.OrderBy(m => m.Timestamp).ToList();
     }
 }

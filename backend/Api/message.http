@@ -2,7 +2,8 @@ POST http://localhost:5000/api/messages/classify
 Content-Type: application/json
 
 {
-  "Text": "kargom nerede kaldı?"
+  "Text": "Dün sabah kargom kargoya verilmişti. nerede kaldı?",
+  "UserId": "httptest"
 }
 
 ### Get Message
