@@ -5,7 +5,7 @@ import CustomerChat from "./components/CustomerChat";
 import { useState, useEffect } from "react";
 
 export default function CustomerPage() {
-
+  const [activeChatId, setActiveChatId] = useState(null);
   const [user, setUser] = useState({
       username: "",
       userId: "",
@@ -16,7 +16,7 @@ export default function CustomerPage() {
         const u = localStorage.getItem("username") || "Kullanıcı";
         setUser({
           username: u,
-          userId: u, // şimdilik username = userId
+          userId: u,
         });
       }
     }, []);
@@ -25,13 +25,14 @@ export default function CustomerPage() {
     <div className="min-h-screen bg-gray-50 flex">
           <CustomerSidebarContainer
             user={user}
-            activeChatId={null}
-            onSelectChat={undefined}
+            activeChatId={activeChatId}
+            onSelectNewChat={() => {setActiveChatId(null);}}
+            onSelectChat={(id) => {setActiveChatId(id);}}
           />
     
           {/* Content */}
           <div className="flex-1 flex flex-col min-w-0">
-            <CustomerChat />
+            <CustomerChat activeChatId={activeChatId} setActiveChatId={setActiveChatId} />
           </div>
         </div>
   );

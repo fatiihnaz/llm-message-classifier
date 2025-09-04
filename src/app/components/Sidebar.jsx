@@ -15,6 +15,7 @@ export default function Sidebar({
   activeChatId = null,
   selectedCategory = null,
   onSelectChat,
+  onSelectNewChat,
   onSelectDashboard,
   onSelectCategory,
 }) {
@@ -40,7 +41,7 @@ export default function Sidebar({
 
       {/* Dashboard butonu */}
       <div className="p-3 border-b border-gray-200">
-        <button onClick={isSupport ? onSelectDashboard : undefined} className={`w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-sm transition-colors ${activeChatId === null ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
+        <button onClick={isSupport ? onSelectDashboard : onSelectNewChat} className={`w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-sm transition-colors ${activeChatId === null ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
         >
           {isSupport ? (
             <>

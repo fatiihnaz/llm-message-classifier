@@ -1,31 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ChatBar from "../../components/ChatBar";
-import useMessagesTemp from "../../../hooks/useMessagesTemp";
-import MessageList from "../../customer/components/MessageList";
+import Conversation from "../../components/Conversation";
+import { fetchTicket } from "../../../hooks/useHttp";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 export default function SupportChat({ conversation }) {
   const [message, setMessage] = useState("");
   const [messageStatus, setMessageStatus] = useState("");
 
-  const { hasAnyMessage, handleSentMessage, messages, messagesEndRef } = useMessagesTemp();
+  const {data, isLoading, error} = useQuery({
+    queryKey: ["ticket", conversation],
+    queryFn: ({signal}) => fetchTicket({signal, ticketId: conversation})
+  });
 
-  async function handleSendMessage(text) {
-    if (!text || !text.trim()) return;
-    setMessageStatus("loading");
-
-    try {
-      handleSentMessage(text);
-      setMessageStatus("success");
-      setMessage("");
-      setTimeout(() => setMessageStatus("default"), 800);
-    } catch (err) {
-      setMessageStatus("error");
-      setTimeout(() => setMessageStatus("default"), 1200);
-    }
-  }
+  // async function handleSendMessage(text) {
+  //   if (!text || !text.trim()) return;
+  //   setMessageStatus("loading");
+  //   try {
+  //     handleSentMessage(text);
+  //     setMessageStatus("success");
+  //     setMessage("");
+  //     setTimeout(() => setMessageStatus("default"), 800);
+  //   } catch (err) {
+  //     setMessageStatus("error");
+  //     setTimeout(() => setMessageStatus("default"), 1200);
+  //   }
+  // }
 
   return (
     <LayoutGroup>
@@ -35,25 +38,25 @@ export default function SupportChat({ conversation }) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-gray-500">Müşteri</div>
-              <div className="text-base font-semibold text-gray-900">{conversation?.customer}</div>
+              <div className="text-base font-semibold text-gray-900">{data?.userId}</div>
             </div>
-            <div className="text-xs text-gray-500">Konu: {conversation?.topic}</div>
+            <div className="text-xs text-gray-500">Konu: {data?.topic}</div>
           </div>
         </div>
 
         {/* Mesajlar */}
-        <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+        <Conversation conversationId={conversation} isSupport={true} />
 
         {/* ChatBar */}
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
-            key={hasAnyMessage ? "chatbar-bottom" : "chatbar-top"}
+            key={"chatbar-bottom"}
             layout
             layoutId="support-chatbar"
-            initial={{ opacity: 0, y: hasAnyMessage ? 8 : -8 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: hasAnyMessage ? 8 : -8 }}
-            className={hasAnyMessage ? "px-4 pb-4" : "px-4 pt-4 pb-8"}
+            exit={{ opacity: 0, y:  -8 }}
+            className={"px-4 pb-4"}
           >
             <ChatBar
               message={message}
@@ -61,7 +64,7 @@ export default function SupportChat({ conversation }) {
               error={undefined}
               messageStatus={messageStatus}
               setMessageStatus={setMessageStatus}
-              handleSendMessage={handleSendMessage}
+              handleSendMessage={undefined}
             />
           </motion.div>
         </AnimatePresence>

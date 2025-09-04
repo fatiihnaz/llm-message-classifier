@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Sidebar from "../../components/Sidebar";
 import { fetchUserMessages } from "../../../hooks/useHttp";
 
-export default function CustomerSidebarContainer({ user, activeChatId, onSelectChat }) {
+export default function CustomerSidebarContainer({ user, activeChatId, onSelectChat, onSelectNewChat }) {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['customer.messages', user.userId],
         queryFn: ({ signal }) => fetchUserMessages({ signal, userId: user.userId }),
@@ -20,6 +20,7 @@ export default function CustomerSidebarContainer({ user, activeChatId, onSelectC
             conversations={isLoading || isError ? [] : data}
             activeChatId={activeChatId}
             onSelectChat={onSelectChat}
+            onSelectNewChat={onSelectNewChat}
         />
     )
 

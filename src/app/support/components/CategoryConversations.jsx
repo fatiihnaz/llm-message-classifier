@@ -41,12 +41,12 @@ export default function CategoryConversations({ selectedCategory, onSelectChat }
         ) : (
           data.map((conversation) => {
 
-            const time = formatTime(conversation.createdAt);
+            const time = formatTime(conversation.updatedAt ||conversation.createdAt);
 
             return (
               <button
-                key={conversation.messageId}
-                onClick={() => onSelectChat?.(conversation.messageId)}
+                key={conversation.ticketId}
+                onClick={() => onSelectChat?.(conversation.ticketId)}
                 className={`w-full text-left p-4 flex flex-col gap-1 hover:bg-gray-50 transition-colors`}
               >
                 <div className="flex items-center justify-between">
@@ -59,7 +59,7 @@ export default function CategoryConversations({ selectedCategory, onSelectChat }
                   <span className="text-xs text-gray-500">{time}</span>
                 </div>
                 <div className="text-xs text-gray-500 truncate">
-                  {conversation.category} • {conversation.text}
+                  {conversation.category} • {conversation.initialRequest}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

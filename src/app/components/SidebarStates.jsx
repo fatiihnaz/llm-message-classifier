@@ -80,8 +80,8 @@ function resolveError(isSupport, error) {
     return { message: "Kullanıcı giriş yapmamış (userId required).", Icon: UserX };
   }
 
-  // Mesaj bulunamadı hatası
-  if (/No messages found/i.test(error)) {
+  // Ticket bulunamadı hatası
+  if (/No tickets found/i.test(error)) {
     return isSupport ? { message: "Yeni bir istek yok.", Icon: MessageSquareOff } : { message: "Yeni bir talep oluşturun.", Icon: MessageSquarePlus };
   }
 

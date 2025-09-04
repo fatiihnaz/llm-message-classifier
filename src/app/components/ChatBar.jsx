@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { Mic, Paperclip, Loader2, Check, X, ChevronUp } from "lucide-react";
+import { Mic, Paperclip, Loader2, X, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatBar({message, setMessage, error, messageStatus, setMessageStatus, handleSendMessage}) {
+export default function ChatBar({ message, setMessage, isPending, isError, error, canSend, onSend }) {
   const textareaRef = useRef(null);
 
 
@@ -20,7 +20,7 @@ export default function ChatBar({message, setMessage, error, messageStatus, setM
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if(messageStatus === "default") handleSendMessage(message);
+      if (canSend) onSend(message);
     }
   };
 
@@ -30,7 +30,7 @@ export default function ChatBar({message, setMessage, error, messageStatus, setM
         <div className="relative">
           {/* Hata mesajı */}
           <AnimatePresence>
-            {messageStatus === "error" && (
+            {isError && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -56,10 +56,7 @@ export default function ChatBar({message, setMessage, error, messageStatus, setM
               <textarea
                 ref={textareaRef}
                 value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                  e.target.value.length === 0 ? setMessageStatus("") : setMessageStatus("default");
-                }}
+                onChange={(e) => { setMessage(e.target.value); }}
                 onKeyDown={handleKeyDown}
                 rows={1}
                 placeholder="Herhangi bir şey sor"
@@ -73,39 +70,35 @@ export default function ChatBar({message, setMessage, error, messageStatus, setM
 
             <div className="flex items-center mx-1">
               <motion.button
-                onClick={() => { if(messageStatus === "default") handleSendMessage(message); }}
-                disabled={messageStatus === "loading"}
-                className={`p-3 rounded-full transition-all duration-300 ${messageStatus === "loading"
+                onClick={() => { if (canSend && !isPending) onSend(); }}
+                disabled={!canSend || isPending}
+                className={`p-3 rounded-full transition-all duration-300 ${isPending
                     ? "bg-gray-400 cursor-not-allowed"
-                    : messageStatus === "success"
-                    ? "bg-green-500 hover:bg-green-600"
-                    : messageStatus === "error"
+                    : isError
                     ? "bg-red-500 hover:bg-red-600"
-                    : messageStatus === "default"
+                    : canSend
                     ? "bg-gray-800 hover:bg-gray-700"
-                    : "" } text-white`}>
-                {messageStatus != "" ? (<AnimatePresence mode="wait">
+                    : ""
+                  } text-white`}>
+                <AnimatePresence mode="wait">
                   <motion.div
-                    key={messageStatus}
+                    key={isPending ? "loading" : isError ? "error" : canSend ? "ready" : "idle"}
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {messageStatus === "loading" && (
+                    {isPending ? (
                       <Loader2 size={18} className="animate-spin" />
-                    )}
-                    {messageStatus === "success" && (
-                      <Check size={18} />
-                    )}
-                    {messageStatus === "error" && (
+                    ) : isError ? (
                       <X size={18} />
-                    )}
-                    {messageStatus === "default" && (
+                    ) : canSend ? (
                       <ChevronUp size={18} />
+                    ) : (
+                      <Mic size={18} className="text-gray-500" />
                     )}
                   </motion.div>
-                </AnimatePresence>) : (<Mic size={18} className="text-gray-500" />)}
+                </AnimatePresence>
               </motion.button>
             </div>
           </div>
