@@ -16,7 +16,7 @@ export default function StatsCard({
   const trendColor = isUp ? "text-green-600" : "text-red-600";
 
   return (
-    <div className={`group bg-white rounded-xl border border-gray-200 p-5 hover:border-gray-300 transition-colors ${className}`}>
+    <div className={`group bg-white rounded-xl border border-gray-200  shadow-sm p-5 hover:border-gray-300 transition-colors ${className}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
           <Icon className="w-5 h-5 text-gray-700" />
