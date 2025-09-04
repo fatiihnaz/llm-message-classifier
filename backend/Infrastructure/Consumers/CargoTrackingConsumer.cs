@@ -7,9 +7,9 @@ namespace Infrastructure.Consumers;
 
 public class CargoTrackingConsumer: IConsumer<MessageDistributionContract>
 {
-    private readonly IMessageOperations _operations;
+    private readonly ITicketOperations _operations;
 
-    public CargoTrackingConsumer(IMessageOperations operations)
+    public CargoTrackingConsumer(ITicketOperations operations)
     {
         _operations = operations;
     }

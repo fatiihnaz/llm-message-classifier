@@ -11,15 +11,15 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MessagesController : ControllerBase
+public class TicketsController : ControllerBase
 {
     private readonly AiClassifier _classifier;
     private readonly RoutingKeyResolver _routingKeyResolver;
     private readonly UrgencyResolver _urgencyResolver;
     private readonly RabbitMqOptions _options;
     private readonly ISendEndpointProvider _send;
-    private readonly IMessageOperations _operations;
-    public MessagesController(AiClassifier classifier, RoutingKeyResolver routingKeyResolver, UrgencyResolver urgencyResolver, IOptions<RabbitMqOptions> options, ISendEndpointProvider send, IMessageOperations operations)
+    private readonly ITicketOperations _operations;
+    public TicketsController(AiClassifier classifier, RoutingKeyResolver routingKeyResolver, UrgencyResolver urgencyResolver, IOptions<RabbitMqOptions> options, ISendEndpointProvider send, ITicketOperations operations)
     {
         _classifier = classifier;
         _routingKeyResolver = routingKeyResolver;
@@ -55,11 +55,11 @@ public class MessagesController : ControllerBase
         var exchangeEndpoint = await _send.GetSendEndpoint(new Uri($"exchange:{_options.DirectExchange}?type=direct"));
         await exchangeEndpoint.Send(payload, ctx => ctx.SetRoutingKey(routingKey), ct);
 
-        return Accepted(new { message.MessageId, routingKey });
+        return Accepted(new { message.MessageId });
     }
 
     [HttpGet("support")]
-    public async Task<IActionResult> GetMessages([FromQuery] string RoutingKey, CancellationToken ct)
+    public async Task<IActionResult> GetSupportMessages([FromQuery] string RoutingKey, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(RoutingKey)) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "RoutingKey required" });
 
@@ -80,5 +80,29 @@ public class MessagesController : ControllerBase
         if (messages == null || !messages.Any()) return NoContent();
 
         return Ok(messages);
+    }
+
+    [HttpGet("conversation")]
+    public async Task<IActionResult> GetConversation([FromQuery] Guid TicketId, CancellationToken ct)
+    {
+        if (TicketId == Guid.Empty) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "TicketId required" });
+
+        var conversation = await _operations.GetConversationAsync(TicketId, ct);
+
+        if (conversation == null || !conversation.Any()) return NoContent();
+
+        return Ok(conversation);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetTicket([FromQuery] Guid TicketId, CancellationToken ct)
+    {
+        if (TicketId == Guid.Empty) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "TicketId required" });
+
+        var ticket = await _operations.GetTicketAsync(TicketId, ct);
+
+        if (ticket == null) return NoContent();
+
+        return Ok(ticket);
     }
 }

@@ -7,9 +7,9 @@ namespace Infrastructure.Consumers;
 
 public class SatisfactionConsumer : IConsumer<MessageDistributionContract>
 {
-    private readonly IMessageOperations _operations;
+    private readonly ITicketOperations _operations;
 
-    public SatisfactionConsumer(IMessageOperations operations)
+    public SatisfactionConsumer(ITicketOperations operations)
     {
         _operations = operations;
     }

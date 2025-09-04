@@ -14,7 +14,7 @@ builder.Services.AddAi(builder.Configuration);
 builder.Services.AddClassifier(builder.Configuration);
 builder.Services.AddSingleton<RoutingKeyResolver>();
 builder.Services.AddSingleton<UrgencyResolver>();
-builder.Services.AddScoped<IMessageOperations, MessageOperations>();
+builder.Services.AddScoped<ITicketOperations, TicketOperations>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

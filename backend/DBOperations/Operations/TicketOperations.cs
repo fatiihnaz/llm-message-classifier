@@ -3,11 +3,11 @@ using DBOperations.Entities;
 using DBOperations.Operations;
 using Microsoft.EntityFrameworkCore;
 
-public class MessageOperations : IMessageOperations
+public class TicketOperations : ITicketOperations
 {
     private readonly AppDbContext _database;
 
-    public MessageOperations(AppDbContext database)
+    public TicketOperations(AppDbContext database)
     {
         _database = database;
     }
@@ -32,10 +32,15 @@ public class MessageOperations : IMessageOperations
         return await _database.Tickets.AsNoTracking().Where(m => m.UserId == UserId).ToListAsync(ct);
     }
 
-    public async Task<IReadOnlyList<ChatLine>> GetMessagesAsync(Guid TicketId, CancellationToken ct)
+    public async Task<IReadOnlyList<ChatLine>> GetConversationAsync(Guid TicketId, CancellationToken ct)
     {
         var messages = await _database.Tickets.AsNoTracking().Where(t => t.TicketId == TicketId).Select(t => t.Messages).FirstOrDefaultAsync(ct);
         if (messages is null || messages.Count == 0) return Array.Empty<ChatLine>();
         return messages.OrderBy(m => m.Timestamp).ToList();
+    }
+
+    public async Task<Ticket?> GetTicketAsync(Guid TicketId, CancellationToken ct)
+    {
+        return await _database.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.TicketId == TicketId, ct);
     }
 }
