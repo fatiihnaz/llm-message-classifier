@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Infrastructure.Validators;
 public static class CargoTrackingNumberValidator
 {
-    private static readonly Regex _rx = new(@"^C\d{8}[02468]\d$", RegexOptions.Compiled);
+    private static readonly Regex _rx = new(@"^[Cc]\d{8}[02468]\d$", RegexOptions.Compiled);
 
     public static bool IsValid(string? input)
     {

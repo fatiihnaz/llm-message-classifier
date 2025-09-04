@@ -24,12 +24,12 @@ public class TicketOperations : ITicketOperations
 
     public async Task<List<Ticket>> GetClassifiedMessagesAsync(string RoutingKey, CancellationToken ct)
     {
-        return await _database.Tickets.AsNoTracking().Where(m => m.Status == TicketStatus.Classified && m.RoutingKey == RoutingKey).ToListAsync(ct);
+        return await _database.Tickets.AsNoTracking().Where(m => m.Status == TicketStatus.Classified && m.RoutingKey == RoutingKey).OrderByDescending(m => m.CreatedAt).ToListAsync(ct);
     }
 
     public async Task<List<Ticket>> GetUserMessagesAsync(string UserId, CancellationToken ct)
     {
-        return await _database.Tickets.AsNoTracking().Where(m => m.UserId == UserId).ToListAsync(ct);
+        return await _database.Tickets.AsNoTracking().Where(m => m.UserId == UserId).OrderByDescending(m => m.CreatedAt).ToListAsync(ct);
     }
 
     public async Task<IReadOnlyList<ChatLine>> GetConversationAsync(Guid TicketId, CancellationToken ct)
@@ -57,12 +57,23 @@ public class TicketOperations : ITicketOperations
 
         if (ticket.Status == TicketStatus.Pending) ticket.Status = TicketStatus.Classified;
 
-        ticket.Messages.Add(new ChatLine
-        {
-            Sender = Sender.System,
-            Message = $"Kargo takip numaranız {newNumber} ile canlı desteğe bağlıyorum.",
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        ticket.Messages.Add(
+            new ChatLine
+            {
+                Sender = Sender.Customer,
+                Message = $"{newNumber}",
+                Timestamp = DateTimeOffset.UtcNow
+            }
+        );
+
+        ticket.Messages.Add(
+            new ChatLine
+            {
+                Sender = Sender.System,
+                Message = $"Kargo takip numaranız {newNumber} ile canlı desteğe bağlıyorum.",
+                Timestamp = DateTimeOffset.UtcNow
+            }
+        );
 
         await _database.SaveChangesAsync(ct);
     }

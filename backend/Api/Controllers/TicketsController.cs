@@ -54,8 +54,6 @@ public class TicketsController : ControllerBase
             CargoTrackingNumber = cargoTrackingNumber
         };
 
-        Console.WriteLine($"\n\n{result.Category}");
-        Console.WriteLine($"\n{result.SuggestedReply}");
         var exchangeEndpoint = await _send.GetSendEndpoint(new Uri($"exchange:{_options.DirectExchange}?type=direct"));
         await exchangeEndpoint.Send(payload, ctx => ctx.SetRoutingKey(routingKey), ct);
 
