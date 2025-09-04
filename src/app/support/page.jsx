@@ -91,7 +91,7 @@ export default function SupportPage() {
   const selectedCategory = selectedCategoryId ? categories.find(c => c.id === selectedCategoryId) || null : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50/20 flex">
       <SupportSidebarContainer
         user={user}
         activeChatId={activeChatId}

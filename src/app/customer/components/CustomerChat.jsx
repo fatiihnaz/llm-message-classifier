@@ -1,33 +1,68 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { postMessage } from "@/hooks/useHttp";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { postMessage, patchCargoTrackingNumber, fetchTicket } from "../../../hooks/useHttp";
 import ChatBar from "../../components/ChatBar";
 import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
-import Conversation from "@/app/components/Conversation";
+import Conversation from "../../components/Conversation";
 
 export default function CustomerChat({ activeChatId, setActiveChatId }) {
   const [message, setMessage] = useState("");
+  const [cargoNumber, setCargoNumber] = useState("");
   const username = typeof window !== "undefined" ? localStorage.getItem("username") : "";
+  const queryClient = useQueryClient();
 
   const { mutateAsync: sendMessage, isPending, isError, error } = useMutation({
     mutationFn: async ({ text, userId, signal }) => {
       const body = { Text: text, UserID: userId };
       return postMessage({ signal, body });
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response?.messageId) setActiveChatId(response.messageId);
+      await queryClient.invalidateQueries({ queryKey: ["conversation", response?.messageId] });
     },
   });
 
-  const canSend = message.trim().length > 0 && !isPending;
+  const { mutateAsync: sendPatch, isPending: isPatchPending, isError: isPatchError, error: patchError } = useMutation({
+    mutationFn: async ({ ticketId, cargoTrackingNumber, signal }) => {
+      return patchCargoTrackingNumber({ signal, ticketId, cargoTrackingNumber });
+    },
+    onSuccess: async () => {
+      setCargoNumber("");
+      await queryClient.invalidateQueries({ queryKey: ["ticket", activeChatId] });
+      await queryClient.invalidateQueries({ queryKey: ["conversation", activeChatId] });
+    },
+  });
+
+  const { data: ticket, isFetching: isTicketFetching } = useQuery({
+    queryKey: ["ticket", activeChatId],
+    queryFn: () => fetchTicket({ ticketId: activeChatId }),
+    enabled: !!activeChatId,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: (data) => {
+      if (!data) return 4000;
+      return data.cargoTrackingNumber ? false : 4000;
+    },
+  });
+
+  const inPatchMode = !!activeChatId && !ticket?.cargoTrackingNumber;
+  const canSend = inPatchMode ? cargoNumber.trim().length > 0 && !isPatchPending : message.trim().length > 0 && !isPending;
 
   async function handleSendMessage() {
     if (!canSend) return;
     try {
-      await sendMessage({ text: message, userId: username });
-      setMessage("");
+      if (inPatchMode) {
+        await sendPatch({
+          ticketId: activeChatId,
+          cargoTrackingNumber: cargoNumber.trim(),
+        });
+      } else {
+        await sendMessage({ text: message, userId: username });
+        setMessage("");
+      }
     } catch { }
   }
 
@@ -58,12 +93,12 @@ export default function CustomerChat({ activeChatId, setActiveChatId }) {
               >
                 {!activeChatId && (
                   <ChatBar
-                    message={message}
-                    setMessage={setMessage}
-                    isPending={isPending}
-                    isError={isError}
+                    message={inPatchMode ? cargoNumber : message}
+                    setMessage={inPatchMode ? setCargoNumber : setMessage}
+                    isPending={inPatchMode ? isPatchPending || isTicketFetching : isPending}
+                    isError={inPatchMode ? isPatchError : isError}
                     canSend={canSend}
-                    error={error?.message || "Bir hata oluştu."}
+                    error={(inPatchMode ? patchError?.message : error?.message) || "Bir hata oluştu."}
                     onSend={handleSendMessage}
                   />
                 )}
@@ -85,12 +120,13 @@ export default function CustomerChat({ activeChatId, setActiveChatId }) {
                 className={"w-full sm:w-[640px] md:w-[720px] lg:w-[768px] mx-auto"}
               >
                 <ChatBar
-                  message={message}
-                  setMessage={setMessage}
-                  isPending={isPending}
-                  isError={isError}
+                  message={inPatchMode ? cargoNumber : message}
+                  setMessage={inPatchMode ? setCargoNumber : setMessage}
+                  isPending={inPatchMode ? isPatchPending || isTicketFetching : isPending}
+                  isError={inPatchMode ? isPatchError : isError}
                   canSend={canSend}
-                  error={error?.message || "Bir hata oluştu."}
+                  error={(inPatchMode ? patchError?.message : error?.message) || "Bir hata oluştu."}
+                  placeholder={inPatchMode ? "Kargo takip numaranızı girin." : "Herhangi bir şey sorun."}
                   onSend={handleSendMessage}
                 />
               </motion.div>

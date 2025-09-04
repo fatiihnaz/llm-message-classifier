@@ -25,7 +25,8 @@ export default function Conversation({ conversationId, isSupport = false, classN
     const { data, isLoading, error } = useQuery({
         queryKey: ['conversation', conversationId],
         queryFn: ({ signal }) => fetchConversation({ signal, ticketId: conversationId }),
-        enabled: Boolean(conversationId)
+        enabled: Boolean(conversationId),
+        refetchInterval: 3000, 
     })
 
     const containerRef = useRef(null);

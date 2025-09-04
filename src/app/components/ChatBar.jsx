@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { Mic, Paperclip, Loader2, X, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatBar({ message, setMessage, isPending, isError, error, canSend, onSend }) {
+export default function ChatBar({ message, setMessage, isPending, isError, error, canSend, onSend, placeholder }) {
   const textareaRef = useRef(null);
 
 
@@ -47,7 +47,7 @@ export default function ChatBar({ message, setMessage, isPending, isError, error
 
 
           {/* Yazı yazma kısmı */}
-          <div className="flex items-center space-x-3 bg-gray-50 rounded-4xl border border-gray-200 p-1">
+          <div className="flex items-center space-x-3 rounded-4xl shadow-sm border border-gray-200 p-1">
             <button className="p-3 text-gray-500 hover:text-gray-700 transition-colors">
               <Paperclip size={18} />
             </button>
@@ -59,7 +59,7 @@ export default function ChatBar({ message, setMessage, isPending, isError, error
                 onChange={(e) => { setMessage(e.target.value); }}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                placeholder="Herhangi bir şey sor"
+                placeholder={placeholder || "Herhangi bir şey sorun."}
                 className="w-full resize-none border-none outline-none mt-1 text-gray-800 placeholder-gray-500 text-base overflow-y-auto min-h-[24px] max-h-[72px]"
                 style={{
                   scrollbarWidth: 'thin',

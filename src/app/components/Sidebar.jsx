@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, MessageSquarePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LayoutDashboard, MessageSquarePlus, LogOut } from "lucide-react";
 import SidebarCategorySelector from "../support/components/SidebarCategorySelector";
 import { SidebarCustomerConversations, SidebarSupportConversations } from "./SidebarConversations";
 import SidebarStates from "./SidebarStates";
@@ -19,9 +20,14 @@ export default function Sidebar({
   onSelectDashboard,
   onSelectCategory,
 }) {
-
+  
+  const router = useRouter();
   const isSupport = usePathname().includes("/support");
   const ConversationComponent = isSupport ? SidebarSupportConversations : SidebarCustomerConversations;
+
+  const handleLogout = () => {
+    router.push("/");
+  };
 
   return (
     <aside className="w-72 shrink-0 border-r border-gray-200 bg-white flex flex-col h-screen sticky top-0">
@@ -33,10 +39,17 @@ export default function Sidebar({
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold text-gray-900 truncate">{user.username}</div>
           <div className="text-xs text-gray-500">{isSupport ? "Destek Ekibi" : "Müşteri"}</div>
         </div>
+        {/* Çıkış Butonu */}
+        <button
+          onClick={handleLogout}
+          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Dashboard butonu */}

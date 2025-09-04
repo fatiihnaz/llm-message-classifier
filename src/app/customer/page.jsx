@@ -22,7 +22,7 @@ export default function CustomerPage() {
     }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50/20 flex">
           <CustomerSidebarContainer
             user={user}
             activeChatId={activeChatId}

@@ -9,7 +9,8 @@ export default function CustomerSidebarContainer({ user, activeChatId, onSelectC
         queryKey: ['customer.messages', user.userId],
         queryFn: ({ signal }) => fetchUserMessages({ signal, userId: user.userId }),
         enabled: Boolean(user.userId),
-        retry: (failureCount, error) => { if (error.message === "No messages found") return false; return failureCount < 2; }
+        retry: (failureCount, error) => { if (error.message === "No messages found") return false; return failureCount < 2; },
+        refetchInterval: 10000,
     });
 
     return (

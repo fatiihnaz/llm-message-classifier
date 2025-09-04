@@ -16,6 +16,7 @@ export default function SupportSidebarContainer({
     queryKey: ['support.requests', selectedCategory?.routingKey],
     queryFn: ({ signal }) => fetchSupportRequests({ signal, routingKey: selectedCategory?.routingKey }),
     enabled: Boolean(selectedCategory?.routingKey),
+    refetchInterval: 10000,
   });
 
   return (
