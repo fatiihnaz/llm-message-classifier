@@ -13,6 +13,7 @@ public sealed class RabbitMqOptions
     public string CargoTracking { get; set; } = "support.cargo.tracking";
     public string Payment { get; set; } = "support.payment";
     public string Satisfaction { get; set; } = "support.satisfaction";
+    public string TicketOperations { get; set; } = "ticket.operations";
 
     public int PrefetchCount { get; set; } = 16;
     public bool Durable { get; set; } = true;

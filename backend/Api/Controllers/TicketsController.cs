@@ -4,6 +4,7 @@ using AiWorker;
 using Infrastructure;
 using Infrastructure.Resolvers;
 using Infrastructure.Contracts;
+using Infrastructure.Validators;
 using MassTransit;
 using DBOperations.Operations;
 
@@ -37,6 +38,8 @@ public class TicketsController : ControllerBase
         var routingKey = _routingKeyResolver.Resolve(result.Category);
         var urgency = _urgencyResolver.Resolve(result.Urgency);
 
+        var cargoTrackingNumber = MessageValidator.TryExtractFirst(message.Text);
+
         var payload = new MessageDistributionContract
         {
             MessageId = message.MessageId,
@@ -47,7 +50,8 @@ public class TicketsController : ControllerBase
             Category = result.Category,
             Urgency = urgency,
             SuggestedReply = result.SuggestedReply,
-            RoutingKey = routingKey
+            RoutingKey = routingKey,
+            CargoTrackingNumber = cargoTrackingNumber
         };
 
         Console.WriteLine($"\n\n{result.Category}");
@@ -104,5 +108,25 @@ public class TicketsController : ControllerBase
         if (ticket == null) return NoContent();
 
         return Ok(ticket);
+    }
+
+    [HttpPatch("cargo-tracking-number")]
+    public async Task<IActionResult> UpdateCargoTrackingNumber([FromQuery] Guid TicketId, [FromBody] CargoTrackingNumberContract payload, CancellationToken ct)
+    {
+        var newNumber = payload?.CargoTrackingNumber?.Trim();
+        if (!CargoTrackingNumberValidator.IsValid(newNumber)) return BadRequest(new ProblemDetails { Title = "Validation error", Detail = "CargoTrackingNumber required" });
+
+        var ticket = await _operations.GetTicketAsync(TicketId, ct);
+        if (ticket is null) return NotFound();
+
+        var endpoint = await _send.GetSendEndpoint(new Uri($"queue:{_options.TicketOperations}"));
+        await endpoint.Send(new TicketOperationContract
+        {
+            TicketID = TicketId,
+            CargoTrackingNumber = newNumber!
+        }, ct);
+
+
+        return Accepted();
     }
 }

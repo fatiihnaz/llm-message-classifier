@@ -43,4 +43,27 @@ public class TicketOperations : ITicketOperations
     {
         return await _database.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.TicketId == TicketId, ct);
     }
+
+    public async Task SetCargoTrackingNumberAsync(Guid ticketId, string cargoTrackingNumber, CancellationToken ct = default)
+    {
+        var ticket = await _database.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId, ct);
+        if (ticket is null) return;
+
+        var newNumber = cargoTrackingNumber?.Trim();
+        if (string.IsNullOrWhiteSpace(newNumber)) return;
+        if (string.Equals(ticket.CargoTrackingNumber, newNumber, StringComparison.OrdinalIgnoreCase)) return;
+
+        ticket.CargoTrackingNumber = newNumber;
+
+        if (ticket.Status == TicketStatus.Pending) ticket.Status = TicketStatus.Classified;
+
+        ticket.Messages.Add(new ChatLine
+        {
+            Sender = Sender.System,
+            Message = $"Kargo takip numaranız {newNumber} ile canlı desteğe bağlıyorum.",
+            Timestamp = DateTimeOffset.UtcNow
+        });
+
+        await _database.SaveChangesAsync(ct);
+    }
 }

@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
             x.AddConsumer<CargoTrackingConsumer>();
             x.AddConsumer<PaymentConsumer>();
             x.AddConsumer<SatisfactionConsumer>();
+            x.AddConsumer<TicketOperationConsumer>();
 
             x.UsingRabbitMq((context, config) =>
             {
@@ -74,6 +75,11 @@ public static class ServiceCollectionExtensions
                     });
 
                     e.ConfigureConsumer<SatisfactionConsumer>(context);
+                });
+
+                config.ReceiveEndpoint(options.TicketOperations, e =>
+                {
+                    e.ConfigureConsumer<TicketOperationConsumer>(context);
                 });
             });
         });

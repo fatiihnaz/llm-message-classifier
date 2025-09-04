@@ -1,8 +1,8 @@
-POST http://localhost:5000/api/messages/classify
+POST http://localhost:5000/api/tickets/classify
 Content-Type: application/json
 
 {
-  "Text": "Dün sabah kargom kargoya verilmişti. nerede kaldı?",
+  "Text": "Dün sabah kargom kargoya verilmişti. nerede bu?",
   "UserId": "httptest"
 }
 
@@ -16,3 +16,20 @@ Accept: application/json
 
 ### Get Ticket
 GET http://localhost:5000/api/tickets?TicketId=86009d11-7d4b-45fb-bad6-8a01dd6e9d69
+
+###
+PATCH http://localhost:5000/api/tickets/cargo-tracking-number?TicketID=48e05167-9d2d-44a4-97d6-72f0f1a0b4fb
+Content-Type: application/json
+
+{
+  "CargoTrackingNumber": "C1234567888"
+}
+
+###
+POST http://localhost:5000/api/tickets/classify
+Content-Type: application/json
+
+{
+  "Text": "Dün sabah kargom kargoya verilmişti. nerede bu?  Kodum C1234567888",
+  "UserId": "httptest"
+}
