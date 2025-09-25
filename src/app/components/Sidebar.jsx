@@ -63,7 +63,7 @@ export default function Sidebar({
             </>
           ) : <>
             <MessageSquarePlus className="w-4 h-4" />
-            <span>Yeni Sohbet</span>
+            <span>Yeni Talep</span>
           </>}
         </button>
       </div>

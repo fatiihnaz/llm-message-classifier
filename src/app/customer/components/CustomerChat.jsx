@@ -117,7 +117,7 @@ export default function CustomerChat({ activeChatId, setActiveChatId }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                className={"w-full sm:w-[640px] md:w-[720px] lg:w-[768px] mx-auto"}
+                className={"w-full sm:w-[640px] md:w-[720px] lg:w-[768px] mx-auto mb-16"}
               >
                 <ChatBar
                   message={inPatchMode ? cargoNumber : message}

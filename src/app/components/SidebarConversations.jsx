@@ -92,16 +92,16 @@ export function SidebarCustomerConversations( { conversations = [], activeChatId
                     <button
                         key={conversation.ticketId}
                         onClick={() => conversation.ticketId && onSelectChat?.(conversation.ticketId)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors mb-2 flex flex-col gap-1 ${isActive ? "bg-gray-300 text-white border-gray-800" : "bg-white hover:bg-gray-50 text-gray-800 border-gray-200"}`}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors mb-2 flex flex-col gap-1 ${isActive ? "bg-gray-100 text-white border-gray-200 shadow-md" : "bg-white hover:bg-gray-50 text-gray-800 border-gray-200"}`}
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-md flex items-center justify-center ${isActive ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-700"}`}>
+                                <div className={`w-6 h-6 rounded-md flex items-center justify-center ${isActive ? "bg-gray-300/70 text-gray-900" : "bg-gray-100 text-gray-700"}`}>
                                     <MessageSquare className="w-4 h-4" />
                                 </div>
-                                <span className="text-sm font-medium">{conversation.category}</span>
+                                <span className="text-sm text-gray-900 font-medium">{conversation.category}</span>
                             </div>
-                            <span className={`text-xs ${isActive ? "text-gray-300" : "text-gray-500"}`}>{time}</span>
+                            <span className={`text-xs ${isActive ? "text-gray-900" : "text-gray-500"}`}>{time}</span>
                         </div>
                         <div className="text-xs text-gray-500 truncate">
                             {senderNames(lastMessage.sender)} : {lastMessage.message}

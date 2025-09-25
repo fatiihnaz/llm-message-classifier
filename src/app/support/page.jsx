@@ -50,13 +50,13 @@ export default function SupportPage() {
 
   const categories = [
     {
-      id: "satisfaction",
+      id: "support.satisfaction",
       title: "Genel Memnuniyet",
       routingKey: "support.satisfaction",
       icon: Smile,
     },
     {
-      id: "payment",
+      id: "support.payment",
       title: "Ödeme Sorunları",
       routingKey: "support.payment",
       icon: CreditCard,
